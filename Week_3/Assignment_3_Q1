@@ -1,0 +1,37 @@
+def answer_one():
+    # YOUR CODE HERE
+    Energy=pd.read_excel('assets/Energy Indicators.xls',header=[17],na_values='...',
+                    usecols="C:F",skipfooter=(38))
+    Energy.rename(columns={'Unnamed: 2':'Country',
+                       'Petajoules':'Energy Supply',
+                       'Gigajoules':'Energy Supply per Capita',
+                       '%':'% Renewable'},
+              inplace=True)
+    Energy['Energy Supply']=Energy.iloc[:,1].values * 1000000
+    Energy['Country'] = Energy['Country'].str.replace(r" \(.*\)","")
+    Energy['Country'] = Energy['Country'].str.replace(r"\d*","")
+    Energy.replace({"Republic of Korea": "South Korea",
+                       "United States of America": "United States",
+                       "United Kingdom of Great Britain and Northern Ireland": "United Kingdom",
+                       "China, Hong Kong Special Administrative Region": "Hong Kong"}, inplace=True)
+    
+    GDP=pd.read_csv('assets/world_bank.csv',header=[4])
+    GDP.replace({"Korea, Rep.": "South Korea", 
+             "Iran, Islamic Rep.": "Iran",
+             "Hong Kong SAR, China": "Hong Kong"},inplace=True)
+    GDP.rename(columns={'Country Name':'Country'},inplace=True)
+   
+    
+    GDP=GDP.loc[:,['Country','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']]
+    
+    
+    ScimEn=pd.read_excel('assets/scimagojr-3.xlsx')
+    
+    merge1=pd.merge(ScimEn, Energy, how='inner', left_on='Country', right_on='Country')
+    merge1=merge1[merge1['Rank']<=15].sort_values('Rank',ascending=True)
+    
+    merge2=pd.merge(merge1, GDP, how='inner', left_on='Country', right_on='Country').set_index('Country')
+    
+    
+    return merge2
+    raise NotImplementedError()
