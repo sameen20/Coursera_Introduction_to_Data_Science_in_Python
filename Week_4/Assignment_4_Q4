@@ -1,0 +1,48 @@
+import pandas as pd
+import numpy as np
+import scipy.stats as stats
+import re
+
+def get_area(team):
+    for each in list(nfl_cities.index.values):
+        if team in each:
+            return nfl_cities.at[each, 'Metropolitan area']
+
+
+def nfl_correlation(): 
+    # YOUR CODE HERE
+    #raise NotImplementedError()
+    nfl_df=pd.read_csv("assets/nfl.csv")
+    cities=pd.read_html("assets/wikipedia_data.html")[1]
+    cities=cities.iloc[:-1,[0,3,5,6,7,8]]
+    
+    nfl_df=nfl_df[nfl_df['year']==2018].drop([0,5,10,15,20,25,30,35],axis=0)
+    nfl_df['W']=pd.to_numeric(nfl_df['W'])
+    nfl_df['L']=pd.to_numeric(nfl_df['L'])
+    nfl_df['win_ratio']=nfl_df['W']/(nfl_df['W']+nfl_df['L'])
+    nfl_df['team']=nfl_df['team'].str.replace('*','')
+    nfl_df['team']=nfl_df['team'].str.replace('+','')
+    
+    cities=cities.rename(columns={'Population (2016 est.)[8]':'population'})
+    cities['NFL']=cities['NFL'].str.replace('\[\w.*\]','',regex=True)
+    
+    nfl_cities=cities[['NFL','Metropolitan area']].set_index('NFL')
+    nfl_cities=nfl_cities.drop(['—',''],axis=0)
+    
+    population=cities[['Metropolitan area','population']].set_index('Metropolitan area')
+    
+    nfl_df['area']=nfl_df['team'].apply(lambda x: x.split(' ')[-1])
+    nfl_df['area']=nfl_df['area'].apply(lambda x: get_area(x))
+    
+    a4_df=pd.merge(nfl_df,population,how='inner',left_on='area',right_on='Metropolitan area')
+    
+    a4_df['population']=pd.to_numeric(a4_df['population'])
+    a4_df=a4_df.groupby('area').agg({'win_ratio':np.nanmean,'population':np.nanmean})
+    
+    population_by_region = a4_df['population'] # pass in metropolitan area population from cities
+    win_loss_by_region = a4_df['win_ratio'] # pass in win/loss ratio from nfl_df in the same order as cities["Metropolitan area"]
+
+    assert len(population_by_region) == len(win_loss_by_region), "Q4: Your lists must be the same length"
+    assert len(population_by_region) == 29, "Q4: There should be 29 teams being analysed for NFL"
+
+    return stats.pearsonr(population_by_region, win_loss_by_region)[0]
