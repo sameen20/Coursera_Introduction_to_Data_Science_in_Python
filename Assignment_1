@@ -1,0 +1,48 @@
+Part A:
+
+import re
+def names():
+    simple_string = """Amy is 5 years old, and her sister Mary is 2 years old. 
+    Ruth and Peter, their parents, have 3 kids."""
+    
+    # YOUR CODE HERE
+    result = re.findall('[A-Z][a-z]*', simple_string)
+    
+    #print(result)
+    return result
+    raise NotImplementedError()
+   
+Part B:
+import re
+def grades():
+    with open ("assets/grades.txt", "r") as file:
+        grades = file.read()
+        #for line in grades:
+         #   line.rstrip()
+        result = re.findall('([A-Za-z]+ [A-Za-z]+)(?=: B)',grades)
+                            #([A-Z][a-z]+ [A-Z][a-z]+): B
+    return result
+    # YOUR CODE HERE
+    raise NotImplementedError()
+    
+Part C:
+import re
+def logs():
+    data=[]
+    with open("assets/logdata.txt", "r") as file:
+        logdata = file.read()
+    pattern="""
+    (?P<host>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)
+    (\s\-\s)
+    (?P<user_name>(\w*)(\S))
+    (\  \S)
+    (?P<time>\d+\S\w+\S\d+\S\d+\S\d+\S\d+\s\S\d+)
+    (\S\s\S)
+    (?P<request>\w*\s\S*\s\w*\S\d.\d*) 
+    """
+    for item in re.finditer(pattern,logdata,re.VERBOSE): 
+        data.append(item.groupdict())
+    return data        
+    # YOUR CODE HERE
+    raise NotImplementedError()
+    
