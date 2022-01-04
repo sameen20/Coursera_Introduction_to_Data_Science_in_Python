@@ -1,0 +1,13 @@
+def answer_four():
+    # YOUR CODE HERE
+    a1=answer_one()
+
+    a1['avgGDP']=a1.loc[:,['2006','2007','2008','2009','2010','2011','2012','2013','2014','2015']].mean(skipna=True,axis=1)
+
+    a1.sort_values(['avgGDP'],ascending=False,inplace=True)
+    
+    avg6=a1.index[5]
+
+    a4=a1.iloc[5]['2015']-a1.iloc[5]['2006']
+    return a4
+    raise NotImplementedError()
