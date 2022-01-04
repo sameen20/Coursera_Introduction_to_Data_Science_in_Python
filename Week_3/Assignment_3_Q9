@@ -1,0 +1,12 @@
+def answer_nine():
+    # YOUR CODE HERE
+    a1=answer_one()
+
+    a1['population']=a1['Energy Supply']/a1['Energy Supply per Capita']
+
+    a8_table=a1.sort_values(['population'],ascending=False)
+
+    a8_table['Citable docs per Capita']=a1['Citable documents']/a1['population']
+    correlation=a8_table['Citable docs per Capita'].corr(a8_table['Energy Supply per Capita'])
+    return correlation
+    raise NotImplementedError()
