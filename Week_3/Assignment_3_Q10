@@ -1,0 +1,9 @@
+def answer_ten():
+    # YOUR CODE HERE
+    a1=answer_one()
+
+    HighRenew=a1['% Renewable'].median()
+
+    a10_result = a1['HighRenew']=a1['% Renewable'].apply(lambda x:0 if x<HighRenew else 1)
+    return a10_result
+    raise NotImplementedError()
