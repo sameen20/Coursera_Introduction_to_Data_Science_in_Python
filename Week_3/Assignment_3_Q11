@@ -1,0 +1,27 @@
+def answer_eleven():
+    # YOUR CODE HERE
+    ContinentDict  = {'China':'Asia', 
+                  'United States':'North America', 
+                  'Japan':'Asia', 
+                  'United Kingdom':'Europe', 
+                  'Russian Federation':'Europe', 
+                  'Canada':'North America', 
+                  'Germany':'Europe', 
+                  'India':'Asia',
+                  'France':'Europe', 
+                  'South Korea':'Asia', 
+                  'Italy':'Europe', 
+                  'Spain':'Europe', 
+                  'Iran':'Asia',
+                  'Australia':'Australia', 
+                  'Brazil':'South America'}
+
+    a1=answer_one()
+
+    a1['population']=a1['Energy Supply']/a1['Energy Supply per Capita']
+
+    a1['Continent']=pd.Series(ContinentDict)
+
+    a11_result = a1.groupby('Continent')['population'].agg([np.size,np.sum,np.mean,np.std])
+    return a11_result
+    raise NotImplementedError()
