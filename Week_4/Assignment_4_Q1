@@ -1,0 +1,67 @@
+import pandas as pd
+import numpy as np
+import scipy.stats as stats
+import re
+
+
+
+def nhl_correlation(): 
+    
+    #raise NotImplementedError()
+
+    
+    def clear_data(string1):
+        if re.search('\[\w.*\]', string1) is None:
+            return string1
+        else:
+            return string1.replace(re.search('\[\w.*\]', string1).group(), '')
+        
+    def get_area(team):
+        for each in list(nhl_cities.index.values):
+            if team in each:
+                return nhl_cities.at[each, 'Metropolitan area']
+
+
+    
+
+
+
+    # YOUR CODE HERE
+    
+    nhl_df=pd.read_csv("assets/nhl.csv")
+    cities=pd.read_html("assets/wikipedia_data.html")[1]
+    cities=cities.iloc[:-1,[0,3,5,6,7,8]]
+    
+    nhl_df=nhl_df[nhl_df['year']==2018].drop([0,9,18,26],axis=0)
+    nhl_df['W']=pd.to_numeric(nhl_df['W'])
+    nhl_df['L']=pd.to_numeric(nhl_df['L'])
+    nhl_df['win_ratio']=nhl_df['W']/(nhl_df['W']+nhl_df['L'])
+
+    cities.rename(columns={'Population (2016 est.)[8]':'population'},inplace=True)
+
+    cities['NHL'] = cities['NHL'].apply(lambda x: clear_data(x))
+
+    population=cities[['Metropolitan area','population']]
+    population=population.set_index(['Metropolitan area'])
+
+    nhl_cities=cities[['Metropolitan area', 'NHL']].set_index('NHL')
+    nhl_cities=nhl_cities.drop(['—',''],axis=0)
+
+    nhl_df['team']=nhl_df['team'].str.replace('*','')
+    nhl_df['area']=nhl_df['team'].apply(lambda x: x.split(" ")[-1])
+
+
+    nhl_df['area'] = nhl_df['area'].apply(lambda x: get_area(x))
+
+    a1_df=pd.merge(nhl_df,population,how='inner',left_on='area',right_on='Metropolitan area')
+    a1_df['population']=pd.to_numeric(a1_df['population'])
+    
+    a1_df=a1_df.groupby('area').agg({'win_ratio': np.nanmean, 'population': np.nanmean})
+    population_by_region = a1_df['population'] # pass in metropolitan area population from cities
+    win_loss_by_region = a1_df['win_ratio'] # pass in win/loss ratio from nhl_df in the same order as cities["Metropolitan area"]
+    
+    
+    assert len(population_by_region) == len(win_loss_by_region), "Q1: Your lists must be the same length"
+    assert len(population_by_region) == 28, "Q1: There should be 28 teams being analysed for NHL"
+    
+    return stats.pearsonr(population_by_region, win_loss_by_region)[0]
