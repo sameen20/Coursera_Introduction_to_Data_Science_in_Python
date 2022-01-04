@@ -1,0 +1,27 @@
+def answer_twelve():
+    # YOUR CODE HERE
+    ContinentDict  = {'China':'Asia', 
+                  'United States':'North America', 
+                  'Japan':'Asia', 
+                  'United Kingdom':'Europe', 
+                  'Russian Federation':'Europe', 
+                  'Canada':'North America', 
+                  'Germany':'Europe', 
+                  'India':'Asia',
+                  'France':'Europe', 
+                  'South Korea':'Asia', 
+                  'Italy':'Europe', 
+                  'Spain':'Europe', 
+                  'Iran':'Asia',
+                  'Australia':'Australia', 
+                  'Brazil':'South America'}
+
+    a1=answer_one()
+
+    a1['Continent']=pd.Series(ContinentDict)
+
+    a1['% Renewable']=pd.cut(a1['% Renewable'],5)
+
+    a12_result = a1.groupby(['Continent','% Renewable'])['Continent'].agg(np.size).dropna()
+    return a12_result
+    raise NotImplementedError()
