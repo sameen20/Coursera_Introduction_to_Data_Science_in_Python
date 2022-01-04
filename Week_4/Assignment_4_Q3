@@ -1,0 +1,43 @@
+import pandas as pd
+import numpy as np
+import scipy.stats as stats
+import re
+
+def get_area(team):
+    for each in list(mlb_cities.index.values):
+        if team in each:
+            return mlb_cities.at[each, 'Metropolitan area']
+
+def mlb_correlation(): 
+    # YOUR CODE HERE
+    #raise NotImplementedError()
+    
+    mlb_df=pd.read_csv("assets/mlb.csv")
+    cities=pd.read_html("assets/wikipedia_data.html")[1]
+    cities=cities.iloc[:-1,[0,3,5,6,7,8]]
+    mlb_df=mlb_df[mlb_df['year']==2018]
+    cities['MLB']=cities['MLB'].replace('\[\w.*\]','',regex=True)
+    cities=cities.rename(columns={'Population (2016 est.)[8]':'population'})
+    
+    mlb_cities=cities[['Metropolitan area','MLB']].set_index(['MLB'])
+    mlb_cities=mlb_cities.drop(['—',''],axis=0)
+    
+    population=cities[['Metropolitan area','population']].set_index('Metropolitan area')
+    
+    mlb_df['area']=mlb_df['team'].apply(lambda x: x.split(' ')[-1])
+    mlb_df['area']=mlb_df['area'].apply(lambda x: get_area(x))
+    mlb_df.at[0,'area']='Boston'
+    
+    a3_df=pd.merge(mlb_df,population,how='inner',left_on='area',right_on='Metropolitan area')
+    a3_df['W-L%']=pd.to_numeric(a3_df['W-L%'])
+    a3_df['population']=pd.to_numeric(a3_df['population'])
+    
+    a3_df=a3_df.groupby('area').agg({'W-L%':np.nanmean,'population':np.nanmean})
+    
+    population_by_region = a3_df['population'] # pass in metropolitan area population from citie
+    win_loss_by_region = a3_df['W-L%']# pass in win/loss ratio from mlb_df in the same order as cities["Metropolitan area"]
+
+    assert len(population_by_region) == len(win_loss_by_region), "Q3: Your lists must be the same length"
+    assert len(population_by_region) == 26, "Q3: There should be 26 teams being analysed for MLB"
+
+    return stats.pearsonr(population_by_region, win_loss_by_region)[0]
