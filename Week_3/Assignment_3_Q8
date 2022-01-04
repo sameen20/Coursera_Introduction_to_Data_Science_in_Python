@@ -1,0 +1,10 @@
+def answer_eight():
+    # YOUR CODE HERE
+    a1=answer_one()
+
+    a1['population']=a1['Energy Supply']/a1['Energy Supply per Capita']
+
+    a8_result=a1.sort_values(['population'],ascending=False).iloc[2]
+
+    return a8_result.name
+    raise NotImplementedError()
