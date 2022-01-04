@@ -1,0 +1,49 @@
+import pandas as pd
+import numpy as np
+import scipy.stats as stats
+import re
+
+def clear_data(string1):
+    if re.search('\[\w.*\]',string1) is None:
+        return string1
+    else:
+        return string1.replace(re.search('\[\w.*\]',string1).group(),'')
+
+def get_area(team):
+    for each in list(nba_cities.index.values):
+        if team in each:
+            return nba_cities.at[each, 'Metropolitan area']
+        
+def nba_correlation():
+    # YOUR CODE HERE
+    #raise NotImplementedError()
+    nba_df=pd.read_csv("assets/nba.csv")
+    cities=pd.read_html("assets/wikipedia_data.html")[1]
+    cities=cities.iloc[:-1,[0,3,5,6,7,8]]
+
+    nba_df=nba_df[nba_df['year']==2018]
+    nba_df['team']=nba_df['team'].replace('\**\s\(\d.*\)','',regex=True)
+    
+    cities=cities.rename(columns={'Population (2016 est.)[8]':'population'})
+    cities['NBA']=cities['NBA'].apply(lambda x: clear_data(x))
+    
+    nba_cities=cities[['NBA','Metropolitan area']].set_index('NBA')
+    nba_cities=nba_cities.drop(['—', ''], axis=0)
+    
+    population=cities[['Metropolitan area','population']].set_index('Metropolitan area')
+    
+    nba_df['area']=nba_df['team'].apply(lambda x: x.split(' ')[-1])
+    nba_df['area']=nba_df['area'].apply(lambda x: get_area(x))
+    
+    a2_df=pd.merge(nba_df,population,how='inner',left_on='area',right_on='Metropolitan area')
+    a2_df['W/L%']=pd.to_numeric(a2_df['W/L%'])
+    a2_df['population']=pd.to_numeric(a2_df['population'])
+    a2_df=a2_df.groupby('area').agg({'W/L%':np.nanmean,'population':np.nanmean})
+    
+    population_by_region = a2_df['population'] # pass in metropolitan area population from cities
+    win_loss_by_region = a2_df['W/L%'] # pass in win/loss ratio from nba_df in the same order as cities["Metropolitan area"]
+
+    assert len(population_by_region) == len(win_loss_by_region), "Q2: Your lists must be the same length"
+    assert len(population_by_region) == 28, "Q2: There should be 28 teams being analysed for NBA"
+
+    return stats.pearsonr(population_by_region, win_loss_by_region)[0]
