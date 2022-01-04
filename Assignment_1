@@ -13,6 +13,7 @@ def names():
     raise NotImplementedError()
    
 Part B:
+
 import re
 def grades():
     with open ("assets/grades.txt", "r") as file:
@@ -26,6 +27,7 @@ def grades():
     raise NotImplementedError()
     
 Part C:
+
 import re
 def logs():
     data=[]
