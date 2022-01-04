@@ -1,0 +1,12 @@
+def answer_seven():
+    # YOUR CODE HERE
+    a1['Ratio of SC to TC']=a1['Self-citations']/a1['Citations']
+
+    a7_result = a1.sort_values(['Ratio of SC to TC'],ascending=False).iloc[0]
+
+    a7_result.name
+
+    a7=(a7_result.name,a7_result['Ratio of SC to TC'])
+
+    return a7
+    raise NotImplementedError()
