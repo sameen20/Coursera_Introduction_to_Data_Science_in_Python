@@ -1,0 +1,10 @@
+def answer_six():
+    # YOUR CODE HERE
+    percentage=a1['% Renewable'].max()
+
+    result=a1.sort_values('% Renewable',ascending=False).iloc[0]
+
+    a6=(result.name,percentage)
+
+    return a6
+    raise NotImplementedError()
